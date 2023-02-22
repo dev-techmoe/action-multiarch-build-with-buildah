@@ -1,0 +1,32 @@
+name: build
+on:
+  workflow_dispatch:
+
+env:
+  container_name: myimage
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        arch:
+          - linux/arm64
+          - linux/amd64
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Prepare buildah
+        run: |-
+          apt-get update
+          apt-get install buildah -y
+          buildah -v
+      - name: Build and export container image
+        run: |-
+          # build image
+          export container_name_with_arch="${container_name}:$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
+          echo "target container name: $container_name_with_arch"
+          buildah bud -t $container_name_with_arch --platform ${{ matrix.arch }} .
+          # export image
+          mkdir -p target/images
+          buildah push $container_name_with_arch docker-archive:target/images/$container_name_with_arch.tar
