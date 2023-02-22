@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Prepare buildah
         run: |-
-          apt-get update
+          # apt-get update
           apt-get install buildah -y
           buildah -v
       - name: Build and export container image
