@@ -53,6 +53,11 @@ jobs:
         run: |-
           ls -lah
           tree -h
+      - name: Login docker registry  (ghcr.io)
+        run: |-
+          # new login with new container registry url and PAT
+          # login to Github ghcr.io
+          echo ${{ secrets.GITHUB_TOKEN }} | buildah login ghcr.io -u $GITHUB_ACTOR --password-stdin
       - name: Create manifest and add image from archs
         run: |-
           buildah manifest create $container_name
@@ -64,3 +69,6 @@ jobs:
           done
           echo
           buildah manifest inspect $container_name
+      - name: Push image to registry
+        run: |-
+          buildah manifest push --all $container_name docker://ghcr.io/${GITHUB_REPOSITORY}:latest
