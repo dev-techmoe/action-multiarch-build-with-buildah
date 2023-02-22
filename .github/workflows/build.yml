@@ -63,4 +63,4 @@ jobs:
             buildah manifest add $container_name docker-archive:images/$f --arch $arch
           done
           echo
-          echo buildah manifest inspect $container_name
+         buildah manifest inspect $container_name
