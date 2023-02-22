@@ -24,12 +24,14 @@ jobs:
       - name: Build and export container image
         run: |-
           # build image
-          export container_name_with_arch="${container_name}:$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
+          export container_name_with_arch="${container_name}-$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
           echo "target container name: $container_name_with_arch"
+          echo
           buildah bud -t $container_name_with_arch --platform ${{ matrix.arch }} .
           # export image
           mkdir -p target/images
           buildah push $container_name_with_arch docker-archive:target/images/$container_name_with_arch.tar
+          echo
           tree -h
       - uses: actions/upload-artifact@v3
         name: upload artifact
