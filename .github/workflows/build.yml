@@ -30,23 +30,21 @@ jobs:
           # export image
           mkdir -p target/images
           buildah push $container_name_with_arch docker-archive:target/images/$container_name_with_arch.tar
-      - name: Cache images
-        uses: actions/cache@v3
+      - uses: actions/upload-artifact@v3
+        name: upload artifact
         with:
-          path: target
-          key: myimage-images
+          name: images
+          path: target/images
   
   push-to-registry:
     runs-on: ubuntu-22.04
     needs:
       - build
     steps:
-      - name: Restore cached Primes
-        id: cache-primes-restore
-        uses: actions/cache/restore@v3
+      - uses: actions/download-artifact@v2
+        name: Download artifacts
         with:
-          path: .
-          key: myimage-images
+          name: images
       - name: Listing
         run: |-
           ls -lah
