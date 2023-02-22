@@ -19,7 +19,7 @@ jobs:
       - name: Prepare buildah
         run: |-
           sudo apt-get update
-          sudo apt-get install buildah -y
+          sudo apt-get install buildah qemu-user-static podman -y
           buildah -v
       - name: Build and export container image
         run: |-
