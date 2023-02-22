@@ -48,7 +48,18 @@ jobs:
         name: Download artifacts
         with:
           name: images
+          path: images
       - name: Listing
         run: |-
           ls -lah
           tree -h
+      - name: Create manifest and add image from archs
+        run: |-
+          buildah create manifest $container_name
+          for f in $(ls images)
+          do
+            export arch=$(echo $f | sed -r -e "s/^(.+)-(.+)-(.+)\.tar$/\2\/\3/g")
+            buildah manifest add $container_name docker-archive:images/$f --arch $arch
+          done
+          echo
+          echo buildah manifest inspect $container_name
