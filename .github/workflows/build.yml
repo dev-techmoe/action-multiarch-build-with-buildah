@@ -55,7 +55,7 @@ jobs:
           tree -h
       - name: Create manifest and add image from archs
         run: |-
-          buildah create manifest $container_name
+          buildah manifest create $container_name
           for f in $(ls images)
           do
             export arch=$(echo $f | sed -r -e "s/^(.+)-(.+)-(.+)\.tar$/\2\/\3/g")
