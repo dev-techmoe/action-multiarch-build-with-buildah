@@ -30,6 +30,7 @@ jobs:
           # export image
           mkdir -p target/images
           buildah push $container_name_with_arch docker-archive:target/images/$container_name_with_arch.tar
+          tree -h
       - uses: actions/upload-artifact@v3
         name: upload artifact
         with:
