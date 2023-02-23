@@ -46,7 +46,7 @@ jobs:
           export mount_path=$(sudo buildah mount $container_name)
           echo "mount path: $mount_path"
           sudo cp $mount_path/$binary_path target/binaries/${{ env.container_name_with_arch }}
-          sudo chown $UID:$GID target/binaries/${{ env.container_name_with_arch }}
+          # sudo chown $UID:$GID target/binaries/${{ env.container_name_with_arch }}
           echo
           tree -h
       - uses: actions/upload-artifact@v3
