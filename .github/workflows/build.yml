@@ -43,7 +43,7 @@ jobs:
           export container_name=$(sudo buildah from ${{ env.container_name_with_arch }})
           echo "Container name: $container_name"
           echo "+ Mount and copy binary from container"
-          export mount_path=$(sudo buildah mount ${{ env.container_name_with_arch }})
+          export mount_path=$(sudo buildah mount $container_name)
           echo "mount path: $mount_path"
           sudo cp $mount_path/$binary_path target/binaries/${{ env.container_name_with_arch }}
           sudo chown $UID:$GUI target/binaries/${{ env.container_name_with_arch }}
