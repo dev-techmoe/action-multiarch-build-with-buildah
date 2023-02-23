@@ -80,7 +80,7 @@ jobs:
           do
             export arch=$(echo $f | sed -r -e "s/^(.+)-(.+)-(.+)\.tar$/\2\/\3/g")
             echo "Run command: 'buildah manifest add $container_name docker-archive:target/images/$f --arch $arch'"
-            buildah manifest add $container_name docker-archive:images/$f --arch $arch
+            buildah manifest add $container_name docker-archive:target/images/$f --arch $arch
           done
           echo
           buildah manifest inspect $container_name
