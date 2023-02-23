@@ -22,30 +22,31 @@ jobs:
           sudo apt-get update
           sudo apt-get install buildah qemu-user-static podman -y
           buildah -v
+      - name: Generating image name
+        run: |-
+          export container_name_with_arch="${container_name}-$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
+          echo "container_name_with_arch=$container_name_with_arch" >> $GITHUB_ENV
+          echo "target container name: $container_name_with_arch"
       - name: Build and export container image
         run: |-
-          # build image
-          export container_name_with_arch="${container_name}-$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
-          echo "target container name: $container_name_with_arch"
-          echo
-          buildah bud -t $container_name_with_arch --platform ${{ matrix.arch }} .
+          buildah bud -t ${{ env.container_name_with_arch }} --platform ${{ matrix.arch }} .
           # export image
           mkdir -p target/images
-          buildah push $container_name_with_arch docker-archive:target/images/$container_name_with_arch.tar
+          buildah push $container_name_with_arch docker-archive:target/images/${{ env.container_name_with_arch }}.tar
       - name: Export binary
         run: |-   
           # export binary
           mkdir -p target/binaries
           echo "+ Re-import image with root permission"
-          sudo buildah pull docker-archive:target/images/$container_name_with_arch.tar
+          sudo buildah pull docker-archive:target/images/${{ env.container_name_with_arch }}.tar
           echo "+ Get the container from image"
-          export container_name=$(sudo buildah from $container_name_with_arch)
+          export container_name=$(sudo buildah from ${{ env.container_name_with_arch }})
           echo "Container name: $container_name"
           echo "+ Mount and copy binary from container"
-          export mount_path=$(sudo buildah mount $container_name)
+          export mount_path=$(sudo buildah mount ${{ env.container_name_with_arch }})
           echo "mount path: $mount_path"
-          sudo cp $mount_path/$binary_path target/binaries/$container_name_with_arch
-          sudo chown $UID:$GUI target/binaries/$container_name_with_arch
+          sudo cp $mount_path/$binary_path target/binaries/${{ env.container_name_with_arch }}
+          sudo chown $UID:$GUI target/binaries/${{ env.container_name_with_arch }}
           echo
           tree -h
       - uses: actions/upload-artifact@v3
