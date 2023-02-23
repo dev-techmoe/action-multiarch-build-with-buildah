@@ -4,6 +4,7 @@ on:
 
 env:
   container_name: myimage
+  binary_path: /test.txt
 
 jobs:
   build:
@@ -13,10 +14,6 @@ jobs:
         arch:
           - linux/arm64
           - linux/amd64
-          - linux/arm
-          - linux/386
-          - linux/ppc64le
-          - linux/s390x
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -35,6 +32,20 @@ jobs:
           # export image
           mkdir -p target/images
           buildah push $container_name_with_arch docker-archive:target/images/$container_name_with_arch.tar
+      - name: Export binary
+        run: |-   
+          # export binary
+          mkdir -p target/binaries
+          echo "+ Re-import image with root permission"
+          sudo buildah pull docker-archive:target/images/$container_name_with_arch.tar
+          echo "+ Get the container from image"
+          export container_name=$(sudo buildah from $container_name_with_arch)
+          echo "Container name: $container_name"
+          echo "+ Mount and copy binary from container"
+          export mount_path=$(sudo buildah mount $container_name)
+          echo "mount path: $mount_path"
+          sudo cp $mount_path/$binary_path target/binaries/$container_name_with_arch
+          sudo chown $UID:$GUI target/binaries/$container_name_with_arch
           echo
           tree -h
       - uses: actions/upload-artifact@v3
@@ -67,7 +78,7 @@ jobs:
           buildah manifest create $container_name
           for f in $(ls images)
           do
-            export arch=$(echo $f | sed -r -e "s/^(.+)-(.+)-(.+)\.tar$/\3/g")
+            export arch=$(echo $f | sed -r -e "s/^(.+)-(.+)-(.+)\.tar$/\2\/\3/g")
             echo "Run command: 'buildah manifest add $container_name docker-archive:images/$f --arch $arch'"
             buildah manifest add $container_name docker-archive:images/$f --arch $arch
           done
