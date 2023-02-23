@@ -27,7 +27,6 @@ jobs:
           export container_name_with_arch="${container_name}-$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
           echo "container_name_with_arch=$container_name_with_arch" >> $GITHUB_ENV
           echo "target container name: $container_name_with_arch"
-          echo "RELEASE_NAME=v$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
       - name: Build and export container image
         run: |-
           buildah bud -t ${{ env.container_name_with_arch }} --platform ${{ matrix.arch }} .
@@ -95,6 +94,9 @@ jobs:
     needs:
       - build
     steps:
+      - name: Generate names
+        run: |-
+          echo "RELEASE_NAME=v$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
       - uses: actions/download-artifact@v2
         name: Download artifacts
         with:
