@@ -14,6 +14,10 @@ jobs:
         arch:
           - linux/arm64
           - linux/amd64
+          - linux/arm
+          - linux/386
+          - linux/ppc64le
+          - linux/s390x
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
