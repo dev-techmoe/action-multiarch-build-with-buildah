@@ -7,7 +7,7 @@ env:
   binary_path: /test.txt
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -57,7 +57,7 @@ jobs:
   push-to-registry:
     runs-on: ubuntu-22.04
     needs:
-      - build
+      - build-linux
     steps:
       - uses: actions/download-artifact@v2
         name: Download artifacts
@@ -92,7 +92,7 @@ jobs:
   upload-release:
     runs-on: ubuntu-22.04
     needs:
-      - build
+      - build-linux
     steps:
       - name: Generate names
         run: |-
