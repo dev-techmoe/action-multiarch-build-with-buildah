@@ -1,5 +1,5 @@
 FROM alpine
 
-RUN echo "test" > /test.txt
+RUN uname -a > /test.txt
 
 CMD echo "hello world"
