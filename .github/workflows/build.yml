@@ -22,11 +22,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install buildah qemu-user-static podman -y
           buildah -v
-      - name: Generating image name
+      - name: Generating some names
         run: |-
           export container_name_with_arch="${container_name}-$(echo ${{ matrix.arch }} | sed -e "s/\//-/g" )"
           echo "container_name_with_arch=$container_name_with_arch" >> $GITHUB_ENV
           echo "target container name: $container_name_with_arch"
+          echo "RELEASE_NAME=v$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
       - name: Build and export container image
         run: |-
           buildah bud -t ${{ env.container_name_with_arch }} --platform ${{ matrix.arch }} .
@@ -46,6 +47,7 @@ jobs:
           export mount_path=$(sudo buildah mount $container_name)
           echo "mount path: $mount_path"
           sudo cp $mount_path/$binary_path target/binaries/${{ env.container_name_with_arch }}
+          sudo chown $UID:$GID target/binaries/${{ env.container_name_with_arch }}
           echo
           tree -h
       - uses: actions/upload-artifact@v3
@@ -103,4 +105,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "target/binaries/*"
+          name: ${{ env.RELEASE_NAME }}
+          tag: ${{ env.RELEASE_NAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
